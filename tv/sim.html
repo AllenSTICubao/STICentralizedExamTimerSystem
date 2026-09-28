@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STI Exam Lobby - INTERACTIVE SIMULATOR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Oswald:wght@500;700&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 🎨 EUROVISION LIGHT MODE AESTHETIC */
+        :root { --sti-yellow: #fDD000; --sti-blue: #003666; --white: #ffffff; --bg: #f4f7f9; --text-dark: #001f3f; --text-gray: #657786; --border: #e1e8ed; --red: #FF0B2F; --green: #00b35c;}
+        
+        body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; color: var(--text-dark); background: linear-gradient(-45deg, #f4f7f9, #e1e8ed, #ffffff, #f4f7f9); background-size: 400% 400%; animation: gradientBG 15s ease infinite; overflow: hidden;}
+        * { box-sizing: border-box; }
+        
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .orb-blue { position: fixed; width: 60vw; height: 60vw; background: rgba(0, 54, 102, 0.05); filter: blur(12vw); border-radius: 50%; top: -20vw; left: -10vw; animation: float 15s infinite ease-in-out alternate; z-index: -1;}
+        .orb-yellow { position: fixed; width: 50vw; height: 50vw; background: rgba(253, 208, 0, 0.08); filter: blur(10vw); border-radius: 50%; bottom: -15vw; right: -10vw; animation: float 12s infinite ease-in-out alternate-reverse; z-index: -1;}
+        
+        .scanline { position: fixed; top: -10vh; left: 0; width: 100vw; height: 10vh; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(253, 208, 0, 0.15), rgba(255,255,255,0)); z-index: 9999; pointer-events: none; mix-blend-mode: overlay; animation: scan 6s linear infinite;}
+        @keyframes scan { 0% { top: -10vh; } 100% { top: 110vh; } }
+
+        .top-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); border-bottom: 2px solid var(--white); display: flex; justify-content: space-between; align-items: center; padding: 2vh 4vw; box-shadow: 0 1vh 3vh rgba(0,54,102,0.05); position: relative; z-index: 10;}
+        .brand-zone { display: flex; align-items: center; gap: 2vw;}
+        .board-title { font-family: 'Oswald'; font-size: 4.5vh; color: var(--sti-blue); letter-spacing: 0.1vw; text-transform: uppercase; line-height: 1; display: flex; align-items: center;}
+        .board-title span { color: var(--sti-yellow); background: var(--sti-blue); padding: 0.5vh 1vw; border-radius: 1vh; margin-right: 1vw;}
+        .clock-zone { text-align: right; }
+        .clock-time { font-family: 'JetBrains Mono', monospace; font-size: 5vh; font-weight: 900; color: var(--sti-blue); letter-spacing: -0.1vw; line-height: 1;}
+        .clock-date { font-family: 'Montserrat'; font-size: 2vh; font-weight: 900; color: var(--text-gray); letter-spacing: 0.2vw; text-transform: uppercase; margin-top: 0.5vh;}
+
+        .board-container { display: flex; width: 100vw; height: 86vh; padding: 2vh 2vw; gap: 2vw; transition: 0.5s; }
+        .col { display: flex; flex-direction: column; transition: width 0.5s ease; width: 50%; }
+        .col-full { width: 100% !important; }
+        .col-hidden { width: 0 !important; overflow: hidden; opacity: 0; padding: 0 !important; margin: 0 !important;}
+        
+        .col-header { font-family: 'Oswald'; font-size: 4vh; color: var(--white); text-transform: uppercase; letter-spacing: 0.2vw; padding: 1.5vh 3vw; border-radius: 1.5vh 1.5vh 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1vh 2vh rgba(0,0,0,0.1); z-index: 2;}
+        .header-active { background: linear-gradient(135deg, var(--sti-blue), #002244); border-bottom: 0.5vh solid var(--sti-yellow); }
+        .header-next { background: linear-gradient(135deg, var(--text-gray), #445566); border-bottom: 0.5vh solid var(--white); }
+
+        .live-dot { display: inline-block; width: 1.8vh; height: 1.8vh; background-color: #ff3333; border-radius: 50%; margin-right: 1vw; box-shadow: 0 0 1vh var(--red); animation: pulse-dot 1.5s infinite alternate ease-in-out;}
+        @keyframes pulse-dot { 0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 rgba(255,11,47,0); } 100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 1.5vh rgba(255,11,47,0.8); } }
+
+        .list-container { flex-grow: 1; background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); border: 2px solid var(--white); border-top: none; border-radius: 0 0 1.5vh 1.5vh; overflow: hidden; position: relative; box-shadow: 0 1vh 3vh rgba(0,54,102,0.05);}
+        .scroll-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 2vh; display: flex; flex-direction: column; gap: 1.5vh; transition: transform 0.1s linear;}
+
+        .exam-row { display: grid; grid-template-columns: 2.5fr 4.5fr 3fr; background: var(--white); border-radius: 1.5vh; padding: 2vh 2.5vh; align-items: center; gap: 2vw; box-shadow: 0 0.5vh 1.5vh rgba(0,0,0,0.05); border-left: 1vw solid transparent; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes rowEnter { 0% { opacity: 0; transform: translateY(4vh) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .row-white { border-left-color: var(--text-gray); border: 2px solid var(--border); }
+        .row-white .timer-val, .row-white .timer-lbl { color: var(--sti-blue); }
+        .row-yellow { border-left-color: var(--sti-yellow); background: rgba(253, 208, 0, 0.1); border: 2px solid var(--sti-yellow); }
+        .row-yellow .timer-val, .row-yellow .timer-lbl { color: #b39200; }
+        .row-green { border-left-color: var(--green); background: rgba(0, 179, 92, 0.1); border: 2px solid var(--green); }
+        .row-green .timer-val, .row-green .timer-lbl { color: #008a47; }
+        .row-red { border-left-color: var(--red); background: rgba(255, 11, 47, 0.1); border: 2px solid var(--red); animation: flash-red 2s infinite alternate;}
+        .row-red .timer-val, .row-red .timer-lbl { color: var(--red); }
+        @keyframes flash-red { 0% { box-shadow: 0 0 0 rgba(255,11,47,0); } 100% { box-shadow: 0 0 2vh rgba(255,11,47,0.4); } }
+        .row-blue { border-left-color: var(--sti-blue); background: var(--sti-blue); color: var(--white); box-shadow: 0 1vh 3vh rgba(0,54,102,0.3);}
+        .row-blue .main-text, .row-blue .sub-text, .row-blue .timer-lbl { color: var(--white); }
+        .row-blue .sub-text { opacity: 0.8; }
+        .row-blue .timer-val { color: var(--sti-yellow); }
+
+        .time-block { display: flex; flex-direction: column; overflow: hidden; justify-content: center;}
+        .main-text { font-family: 'Oswald'; color: var(--sti-blue); line-height: 1.1; letter-spacing: 0.1vw; text-transform: uppercase; }
+        .text-wrap { white-space: normal; word-wrap: break-word; }
+        .text-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .sub-text { font-family: 'Montserrat'; font-size: 1.8vh; font-weight: 900; color: var(--text-gray); letter-spacing: 0.2vw; text-transform: uppercase; margin-bottom: 0.2vh;}
+        .timer-block { text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center;}
+        .timer-val { font-family: 'JetBrains Mono', monospace; font-size: 6vh; font-weight: 900; line-height: 1; letter-spacing: -0.2vw;}
+        .timer-lbl { font-family: 'Oswald'; font-size: 2.2vh; font-weight: 700; letter-spacing: 0.2vw; margin-top: 0.5vh;}
+
+        .full-state { display: none; height: 86vh; width: 100vw; position: absolute; top: 14vh; left: 0; flex-direction: column; justify-content: center; align-items: center; text-align: center; z-index: 5;}
+        #empty-state h2 { font-family: 'Oswald'; font-size: 8vh; color: var(--text-gray); margin: 0; letter-spacing: 0.2vw; opacity: 0.5;}
+        #empty-state p { font-family: 'Montserrat'; font-size: 3vh; font-weight: 900; color: var(--text-gray); letter-spacing: 0.2vw; opacity: 0.5;}
+        #congrats-state h2 { font-family: 'Oswald'; font-size: 10vh; color: var(--sti-blue); margin: 0; letter-spacing: 0.2vw; text-transform: uppercase;}
+        #congrats-state p { font-family: 'Montserrat'; font-size: 3vh; font-weight: 900; color: var(--text-dark); margin: 1vh 0 0 0; letter-spacing: 0.2vw; text-transform: uppercase;}
+        .party-emoji { font-size: 20vh; animation: bounce 2s infinite ease-in-out; margin-bottom: 2vh;}
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3vh); } }
+
+        /* 🎛️ DIRECTOR'S CONTROL PANEL */
+        .control-panel {
+            position: fixed; bottom: 3vh; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 31, 63, 0.9); backdrop-filter: blur(10px); padding: 1.5vh 2vw;
+            border-radius: 5vh; border: 2px solid var(--sti-yellow); display: flex; gap: 1vw; z-index: 9999;
+            box-shadow: 0 2vh 4vh rgba(0,0,0,0.5); display: none;
+        }
+        .ctrl-btn {
+            font-family: 'Oswald'; font-size: 1.8vh; padding: 1vh 1.5vw; border-radius: 3vh; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase;
+        }
+        .ctrl-btn:hover { transform: scale(1.05); }
+        .btn-white { background: var(--white); color: var(--sti-blue); }
+        .btn-yellow { background: var(--sti-yellow); color: var(--sti-dark); }
+        .btn-green { background: var(--green); color: var(--white); }
+        .btn-red { background: var(--red); color: var(--white); }
+        .btn-blue { background: #00aaff; color: var(--sti-dark); }
+        .btn-dark { background: #333; color: var(--white); }
+
+        /* AUDIO UNLOCKER OVERLAY */
+        #unlocker {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 54, 102, 0.95); z-index: 100000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+        }
+        #unlocker h1 { font-family: 'Oswald'; color: var(--sti-yellow); font-size: 6vh; text-align: center;}
+        #unlocker p { font-family: 'Montserrat'; color: var(--white); font-size: 2vh;}
+    </style>
+</head>
+<body>
+
+    <!-- CLICK TO START (Browser requires click for Audio) -->
+    <div id="unlocker" onclick="startSimulator()">
+        <h1>▶ CLICK TO START SIMULATOR</h1>
+        <p>This enables audio chimes and shows the control panel.</p>
+    </div>
+
+    <div class="orb-blue"></div>
+    <div class="orb-yellow"></div>
+    <div class="scanline"></div> 
+
+    <!-- 🔊 AIRPORT CHIMES -->
+    <audio id="chime-audio" src="../uploads/chime/chime.mp3" preload="auto"></audio>
+    <audio id="chime-end-audio" src="../uploads/chime/end.mp3" preload="auto"></audio>
+
+    <div class="top-nav">
+        <div class="brand-zone">
+            <div class="board-title" id="board-title"><span>TEST</span> SIMULATOR MODE</div>
+        </div>
+        <div class="clock-zone">
+            <div class="clock-time" id="sys-time">00:00:00</div>
+            <div class="clock-date" id="sys-date">MANUAL OVERRIDE</div>
+        </div>
+    </div>
+
+    <!-- MAIN BOARDS -->
+    <div class="board-container" id="main-board">
+        <div class="col" id="col-active">
+            <div class="col-header header-active">
+                <div><span class="live-dot"></span>ON-GOING & PREPARING</div>
+                <span id="count-active" style="font-size:2.5vh; background:var(--sti-yellow); color:var(--sti-dark); padding: 0.5vh 2vw; border-radius: 5vh;">0</span>
+            </div>
+            <div class="list-container" id="viewport-active">
+                <div class="scroll-area" id="list-active"></div>
+            </div>
+        </div>
+
+        <div class="col" id="col-upcoming">
+            <div class="col-header header-next">
+                <div>⏸ UP NEXT</div>
+                <span id="count-upcoming" style="font-size:2.5vh; background:var(--white); color:var(--text-gray); padding: 0.5vh 2vw; border-radius: 5vh;">0</span>
+            </div>
+            <div class="list-container" id="viewport-upcoming">
+                <div class="scroll-area" id="list-upcoming"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="full-state" id="empty-state">
+        <h2>STANDBY MODE</h2>
+        <p>NO EXAMS IN THE DATABASE.</p>
+    </div>
+
+    <div class="full-state" id="congrats-state">
+        <div class="party-emoji">🎊</div>
+        <h2>CONGRATULATIONS!</h2>
+        <p>ALL EXAMS ARE COMPLETED TODAY.</p>
+    </div>
+
+    <!-- 🎛️ DIRECTOR'S CONTROL PANEL -->
+    <div class="control-panel" id="ctrl-panel">
+        <button class="ctrl-btn btn-white" onclick="simState('upcoming')">1. Upcoming (White)</button>
+        <button class="ctrl-btn btn-yellow" onclick="simState('yellow')">2. Lobby (Yellow)</button>
+        <button class="ctrl-btn btn-green" onclick="simState('green')">3. Proceed (Green)</button>
+        <button class="ctrl-btn btn-red" onclick="simState('red')">4. Late (Red)</button>
+        <button class="ctrl-btn btn-blue" onclick="simState('ongoing')">▶ Start (Blue)</button>
+        <button class="ctrl-btn btn-dark" onclick="simState('done')">⏹ Finish & Clear</button>
+    </div>
+
+    <script>
+        let audioEnabled = false;
+
+        function startSimulator() {
+            document.getElementById('unlocker').style.display = 'none';
+            document.getElementById('ctrl-panel').style.display = 'flex';
+            audioEnabled = true;
+            playChime('start'); // Test Chime
+        }
+
+        function playChime(type) {
+            if (!audioEnabled) return;
+            const audioId = type === 'end' ? 'chime-end-audio' : 'chime-audio';
+            const chime = document.getElementById(audioId);
+            if (chime) {
+                chime.volume = 0.8; 
+                chime.currentTime = 0;
+                chime.play().catch(e => console.log("Audio blocked."));
+            }
+        }
+
+        // 🧠 MOCK DATABASE (Raw DB state before calculations)
+        let mockDB = [
+            { id: '1', room: '301', subject: 'WEB DEVELOPMENT', proctor: 'DELA CRUZ', status: 'pending', start_time: getUnixOffset(3600), end_time: getUnixOffset(7200), day: 1 }
+        ];
+
+        function getUnixOffset(seconds) {
+            return Math.floor(Date.now() / 1000) + seconds;
+        }
+
+        // 🎛️ BUTTON LOGIC
+        function simState(state) {
+            let ex = mockDB[0]; // Target our test exam
+            
+            if (state === 'upcoming') {
+                ex.status = 'pending';
+                ex.start_time = getUnixOffset(3600); // 1 hr diff
+            }
+            if (state === 'yellow') {
+                ex.status = 'pending';
+                // Trigger Yellow (Lobby Standby). Logic adds 900. We want diff to be 1800 (30m).
+                // So raw time should be +900.
+                ex.start_time = getUnixOffset(900); 
+            }
+            if (state === 'green') {
+                ex.status = 'pending';
+                // Trigger Green (Proceed). Logic adds 900. We want diff to be 900 (15m).
+                // So raw time should be +0.
+                ex.start_time = getUnixOffset(0); 
+            }
+            if (state === 'red') {
+                ex.status = 'pending';
+                // Trigger Red (Late). Logic adds 900. We want diff < 0.
+                // So raw time should be -1000.
+                ex.start_time = getUnixOffset(-1000); 
+            }
+            if (state === 'ongoing') {
+                ex.status = 'ongoing';
+                ex.end_time = getUnixOffset(3600);
+            }
+            if (state === 'done') {
+                ex.status = 'done';
+            }
+            
+            // Force immediate render
+            tickBoard();
+        }
+
+        // -------------------------------------------------------------
+        // ⚙️ COPY-PASTED EXACT LOBBY TV ENGINE TO PROVE IT WORKS!
+        // -------------------------------------------------------------
+        
+        let lastHtmlActive = '';
+        let lastHtmlUpcoming = '';
+        let examStatuses = {};
+        let isInitialized = false;
+        let chimedEvents = new Set();
+        let partyChimed = false;
+
+        setInterval(tickBoard, 1000);
+
+        function tickBoard() {
+            const now = new Date();
+            let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            let ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            document.getElementById('sys-time').innerText = `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s} ${ampm}`;
+            
+            const nowUnix = Math.floor(now.getTime() / 1000);
+
+            // Fetch from our MockDB instead of real PHP API
+            let schedules = JSON.parse(JSON.stringify(mockDB));
+            
+            let activeExams = [];
+            let upcomingExams = [];
+            let doneCount = 0;
+            let totalToday = 0;
+            let playStartChime = false;
+            let playEndChime = false;
+
+            // ⏰ TIME SHIFT LOGIC (Exact replica)
+            schedules.forEach(s => {
+                totalToday++;
+                
+                let announcedTime = parseInt(s.start_time) - 1800; 
+                s.original_scheduled = announcedTime; 
+                s.start_time = announcedTime + 900; 
+                s.end_time = parseInt(s.end_time) - 1800 + 900; 
+
+                if (isInitialized) {
+                    let prev = examStatuses[s.id];
+                    let curr = s.status;
+                    let diffToStart = s.start_time - nowUnix; 
+
+                    if (prev === 'ongoing' && curr === 'done') playEndChime = true;
+                    if (prev === 'pending' && curr === 'ongoing') playStartChime = true;
+                    
+                    if (curr === 'pending') {
+                        if (diffToStart <= 0) {
+                            // Red Zone
+                        } else if (diffToStart <= 900) { 
+                            if (!chimedEvents.has('green_' + s.id)) {
+                                chimedEvents.add('green_' + s.id);
+                                playStartChime = true;
+                            }
+                        } else if (diffToStart <= 1800) { 
+                            if (!chimedEvents.has('yellow_' + s.id)) {
+                                chimedEvents.add('yellow_' + s.id);
+                                playStartChime = true;
+                            }
+                        }
+                    }
+                }
+                examStatuses[s.id] = s.status; 
+                
+                if (s.status === 'done') { doneCount++; return; }
+
+                let diff = s.start_time - nowUnix;
+
+                if (s.status === 'ongoing') {
+                    activeExams.push(s);
+                } else if (s.status === 'pending') {
+                    if (diff <= 1800) { // Goes to Left side exactly 30 mins before
+                        activeExams.push(s);
+                    } else {
+                        upcomingExams.push(s);
+                    }
+                }
+            });
+
+            isInitialized = true; 
+
+            if (playStartChime) playChime('start');
+            else if (playEndChime) playChime('end');
+
+            if (totalToday > 0 && doneCount === totalToday) {
+                document.getElementById('main-board').style.display = 'none';
+                document.getElementById('empty-state').style.display = 'none';
+                document.getElementById('congrats-state').style.display = 'flex';
+                
+                if (!partyChimed) {
+                    partyChimed = true;
+                    playChime('end'); 
+                }
+                return;
+            } else {
+                partyChimed = false;
+                if (totalToday === 0) {
+                    document.getElementById('main-board').style.display = 'none';
+                    document.getElementById('congrats-state').style.display = 'none';
+                    document.getElementById('empty-state').style.display = 'flex';
+                    return;
+                } else {
+                    document.getElementById('main-board').style.display = 'flex';
+                    document.getElementById('congrats-state').style.display = 'none';
+                    document.getElementById('empty-state').style.display = 'none';
+                }
+            }
+
+            function groupExams(examsArr) {
+                let grouped = {};
+                examsArr.forEach(e => {
+                    let key = e.id; 
+                    grouped[key] = { ...e, rooms: [e.room], proctors: [e.proctor] };
+                });
+                return Object.values(grouped).sort((a,b) => {
+                    const rank = { 'ongoing': 1, 'pending': 2, 'done': 3 };
+                    if (rank[a.status] !== rank[b.status]) return rank[a.status] - rank[b.status];
+                    return a.start_time - b.start_time;
+                });
+            }
+
+            const activeGrouped = groupExams(activeExams);
+            const upcomingGrouped = groupExams(upcomingExams);
+
+            const colA = document.getElementById('col-active');
+            const colU = document.getElementById('col-upcoming');
+            
+            if (activeGrouped.length > 0 && upcomingGrouped.length > 0) {
+                colA.className = 'col'; colU.className = 'col';
+            } else if (activeGrouped.length > 0) {
+                colA.className = 'col col-full'; colU.className = 'col col-hidden';
+            } else if (upcomingGrouped.length > 0) {
+                colA.className = 'col col-hidden'; colU.className = 'col col-full';
+            }
+
+            document.getElementById('count-active').innerText = activeGrouped.length;
+            document.getElementById('count-upcoming').innerText = upcomingGrouped.length;
+
+            let htmlLeft = renderListHTML(activeGrouped, nowUnix);
+            let htmlRight = renderListHTML(upcomingGrouped, nowUnix);
+
+            if (htmlLeft !== lastHtmlActive) {
+                document.getElementById('list-active').innerHTML = htmlLeft;
+                lastHtmlActive = htmlLeft;
+            }
+            if (htmlRight !== lastHtmlUpcoming) {
+                document.getElementById('list-upcoming').innerHTML = htmlRight;
+                lastHtmlUpcoming = htmlRight;
+            }
+            
+            updateLiveTimers(nowUnix); 
+        }
+
+        function renderListHTML(items, nowUnix) {
+            let html = '';
+            items.forEach((g, index) => {
+                let delay = index * 0.08; 
+                let rowClass = 'row-white';
+                let timeColHtml = '';
+                
+                const diff = g.start_time - nowUnix;
+                let dObj = new Date(g.original_scheduled * 1000); 
+                let timeStr = !isNaN(dObj) ? dObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+
+                if (g.status === 'ongoing') {
+                    rowClass = 'row-blue';
+                    const duration = g.end_time - g.start_time;
+                    const expectedEnd = (g.actual_start || g.start_time) + duration;
+                    timeColHtml = `<div class="timer-val live-timer" data-target="${expectedEnd}">--:--</div><div class="timer-lbl">TIME LEFT</div>`;
+                } else {
+                    if (diff <= 0) { 
+                        rowClass = 'row-red';
+                        timeColHtml = `<div class="timer-val live-timer" data-target="${g.start_time}">--:--</div><div class="timer-lbl">LATE START</div>`;
+                    } else if (diff <= 900) { 
+                        rowClass = 'row-green';
+                        timeColHtml = `<div class="timer-val live-timer" data-target="${g.start_time}">--:--</div><div class="timer-lbl">PROCEED TO ROOM</div>`;
+                    } else if (diff <= 1800) { 
+                        rowClass = 'row-yellow';
+                        timeColHtml = `<div class="timer-val live-timer" data-target="${g.start_time}">--:--</div><div class="timer-lbl">LOBBY STANDBY</div>`;
+                    } else { 
+                        rowClass = 'row-white';
+                        timeColHtml = `<div class="timer-val">${timeStr}</div><div class="timer-lbl">SCHEDULED</div>`;
+                    }
+                }
+
+                let roomsArray = g.rooms;
+                let roomStr = roomsArray.join(', ');
+                let roomHtml = `<div class="sub-text">ROOM</div><div class="main-text text-wrap" style="font-size: 4.5vh;">${roomStr}</div>`;
+
+                html += `
+                <div class="exam-row ${rowClass}" style="animation: rowEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: ${delay}s;">
+                    <div class="time-block">
+                        ${roomHtml}
+                    </div>
+                    <div class="time-block">
+                        <div class="main-text text-clamp" style="font-size: 3.5vh;">${g.subject}</div>
+                        <div class="sub-text" style="font-size: 1.5vh;">PROCTOR: ${g.proctor}</div>
+                    </div>
+                    <div class="timer-block">
+                        ${timeColHtml}
+                    </div>
+                </div>`;
+            });
+            return html;
+        }
+
+        function updateLiveTimers(nowUnix) {
+            if (!nowUnix) nowUnix = Math.floor(Date.now() / 1000);
+            document.querySelectorAll('.live-timer').forEach(el => {
+                const target = parseInt(el.getAttribute('data-target'));
+                let diff = target - nowUnix;
+                let absDiff = Math.abs(diff);
+
+                const th = Math.floor(absDiff / 3600);
+                const tm = Math.floor((absDiff % 3600) / 60);
+                const ts = absDiff % 60;
+                let tStr = `${th > 0 ? th+':' : ''}${tm < 10 ? '0'+tm : tm}:${ts < 10 ? '0'+ts : ts}`;
+                
+                el.innerText = diff < 0 ? `-${tStr}` : tStr;
+            });
+        }
+    </script>
+</body>
+</html>
