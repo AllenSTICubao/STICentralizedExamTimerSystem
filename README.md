@@ -35,7 +35,8 @@ The ecosystem relies on a Master-Branch architecture:
 
 ### Option A: via Auto-Installer (Recommended)
 This is the standard and most stable way to install the system on your campus server.
-1. Go to the [Releases Page](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/releases).
+
+1. Go to the [Repo](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/).
 2. Download [502STICets-installer.php](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/blob/main/502STICets-installer.php)
 3. Extract the contents directly into your web server's root directory (e.g., `htdocs`, `public_html`, or `/var/www/html`).
 4. Open your browser and navigate to the setup wizard:
@@ -45,7 +46,7 @@ This is the standard and most stable way to install the system on your campus se
  ### Option B: Manual Installation via GitHub
 This is for when you want a certain release or patch.
 
-1. Go to the [Repo](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/).
+1. Go to the [Releases Page](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/releases).
 2. Download the `.zip` file of the latest stable version.
 3. Extract the contents directly into your web server's root directory (e.g., `htdocs`, `public_html`, or `/var/www/html`).
 4. Open your browser and navigate to the setup wizard:
