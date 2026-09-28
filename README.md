@@ -19,7 +19,7 @@ A smart, centralized, and automated examination timer and monitoring system buil
   * Manual single-entry scheduling.
 * 🔍 **Live Deep Search**: Instantly filter the exam queue by Section, Room, Day, Subject, or Proctor with dynamic counts.
 * 🔒 **Proctor Security**: Dedicated proctor passwords to securely unlock TV displays during examination periods.
-* 🎨 **Eurovision Light Mode Aesthetic**: Clean, responsive, and branded UI using the official STI blue and yellow color palette.
+* 🎨 **Clean Light Mode Aesthetic**: Clean, responsive, and branded UI using the official STI blue and yellow color palette.
 
 ---
 
@@ -33,12 +33,24 @@ The ecosystem relies on a Master-Branch architecture:
 
 ## 🚀 Installation Guide (For Branch Campuses)
 
-### Option A: Manual Installation via GitHub (Recommended)
+### Option A: via Auto-Installer (Recommended)
 This is the standard and most stable way to install the system on your campus server.
+1. Go to the [Releases Page](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/releases).
+2. Download [502STICets-installer.php](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/blob/main/502STICets-installer.php)
+3. Extract the contents directly into your web server's root directory (e.g., `htdocs`, `public_html`, or `/var/www/html`).
+4. Open your browser and navigate to the setup wizard:
+   ```text
+   http://your-domain.com/502STICets-installer.php
 
-1. Go to the [Releases Page](https://github.com/AllenSTICubao/STICentalizedExamTimerSystem/releases).
+ ### Option B: Manual Installation via GitHub
+This is for when you want a certain release or patch.
+
+1. Go to the [Repo](https://github.com/AllenSTICubao/STICentralizedExamTimerSystem/).
 2. Download the `.zip` file of the latest stable version.
 3. Extract the contents directly into your web server's root directory (e.g., `htdocs`, `public_html`, or `/var/www/html`).
 4. Open your browser and navigate to the setup wizard:
    ```text
-   [http://your-domain.com/setup.php](http://your-domain.com/syssetup.php)
+   http://your-domain.com/syssetup.php
+
+
+ 
