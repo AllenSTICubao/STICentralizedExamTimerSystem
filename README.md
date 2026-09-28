@@ -1,6 +1,6 @@
 # 🎓 STI College Centralized Exam Timer System (CETS)
 
-![Version](https://img.shields.io/badge/Version-1.0.5-00b35c?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.2.9-00b35c?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production-fDD000?style=for-the-badge&logoColor=003666)
 ![PHP](https://img.shields.io/badge/PHP-7.4%20%7C%208.x-003666?style=for-the-badge&logo=php)
 
