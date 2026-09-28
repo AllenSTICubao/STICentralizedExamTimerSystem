@@ -4,7 +4,7 @@
 ![Status](https://img.shields.io/badge/Status-Production-fDD000?style=for-the-badge&logoColor=003666)
 ![PHP](https://img.shields.io/badge/PHP-7.4%20%7C%208.x-003666?style=for-the-badge&logo=php)
 
-A smart, centralized, and automated examination timer and monitoring system built tailored for STI Campuses. Developed by **Team 5:02 Studio**, this system aims to streamline exam schedules, monitor classroom displays in real-time, and ensure seamless OTA (Over-The-Air) deployments across multiple branch servers.
+A smart, centralized, and automated examination timer and monitoring system built tailored for STI College Campuses. Developed by **Team 5:02 Studio**, this system aims to streamline exam schedules, monitor classroom displays in real-time, and ensure seamless OTA (Over-The-Air) deployments across multiple branch servers.
 
 ---
 
