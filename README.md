@@ -1,4 +1,4 @@
-# 🎓 STI Centralized Exam Timer System (CEATS)
+# 🎓 STI College Centralized Exam Timer System (CETS)
 
 ![Version](https://img.shields.io/badge/Version-1.0.5-00b35c?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production-fDD000?style=for-the-badge&logoColor=003666)
